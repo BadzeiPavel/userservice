@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+  <changeSet id="003-add-indexes" author="pablo">
+    <!-- Index for users table -->
+    <createIndex indexName="idx_users_email"
+      tableName="users"
+      unique="true">
+      <column name="email"/>
+    </createIndex>
+
+    <createIndex indexName="idx_users_name_surname"
+      tableName="users">
+      <column name="name"/>
+      <column name="surname"/>
+    </createIndex>
+
+    <createIndex indexName="idx_users_birth_date"
+      tableName="users">
+      <column name="birth_date"/>
+    </createIndex>
+
+    <!-- Indexes for card_info table -->
+    <createIndex indexName="idx_card_info_user_id"
+      tableName="card_info">
+      <column name="user_id"/>
+    </createIndex>
+
+    <createIndex indexName="idx_card_info_number"
+      tableName="card_info"
+      unique="true">
+      <column name="number"/>
+    </createIndex>
+
+    <createIndex indexName="idx_card_info_expiration_date"
+      tableName="card_info">
+      <column name="expiration_date"/>
+    </createIndex>
+
+    <createIndex indexName="idx_card_info_holder"
+      tableName="card_info">
+      <column name="holder"/>
+    </createIndex>
+
+    <comment>Add performance indexes for better query performance</comment>
+  </changeSet>
+
+</databaseChangeLog>
