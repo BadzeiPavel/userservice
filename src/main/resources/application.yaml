@@ -18,4 +18,6 @@ spring:
     default-schema: ${DATABASE_SCHEMA:user_schema}
     user: ${DATABASE_USERNAME:postgres}
     password: ${DATABASE_PASSWORD:postgres}
-    driver-class-name: org.postgresql.Driver
+#logging:
+#  level:
+#    liquibase: DEBUG

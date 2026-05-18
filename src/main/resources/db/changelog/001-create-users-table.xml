@@ -22,7 +22,10 @@
       <column name="email" type="VARCHAR(100)">
         <constraints nullable="false" unique="true"/>
       </column>
-      <column name="is_deleted" type="BOOLEAN" defaultValueBoolean="false">
+      <column name="active" type="BOOLEAN" defaultValueBoolean="true">
+        <constraints nullable="false"/>
+      </column>
+      <column name="deleted" type="BOOLEAN" defaultValueBoolean="false">
         <constraints nullable="false"/>
       </column>
       <column name="created_at" type="TIMESTAMP">

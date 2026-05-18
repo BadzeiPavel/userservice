@@ -6,7 +6,7 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
   <changeSet id="003-add-indexes" author="pablo">
-    <!-- Index for users table -->
+    <!-- Indexes for users table -->
     <createIndex indexName="idx_users_email"
       tableName="users"
       unique="true">
@@ -24,25 +24,25 @@
       <column name="birth_date"/>
     </createIndex>
 
-    <!-- Indexes for card_info table -->
-    <createIndex indexName="idx_card_info_user_id"
-      tableName="card_info">
+    <!-- Indexes for payment_cards table -->
+    <createIndex indexName="idx_payment_cards_user_id"
+      tableName="payment_cards">
       <column name="user_id"/>
     </createIndex>
 
-    <createIndex indexName="idx_card_info_number"
-      tableName="card_info"
+    <createIndex indexName="idx_payment_cards_number"
+      tableName="payment_cards"
       unique="true">
       <column name="number"/>
     </createIndex>
 
-    <createIndex indexName="idx_card_info_expiration_date"
-      tableName="card_info">
+    <createIndex indexName="idx_payment_cards_expiration_date"
+      tableName="payment_cards">
       <column name="expiration_date"/>
     </createIndex>
 
-    <createIndex indexName="idx_card_info_holder"
-      tableName="card_info">
+    <createIndex indexName="idx_payment_cards_holder"
+      tableName="payment_cards">
       <column name="holder"/>
     </createIndex>
 
