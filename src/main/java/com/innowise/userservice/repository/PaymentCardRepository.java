@@ -21,6 +21,8 @@ public interface PaymentCardRepository extends JpaRepository<PaymentCard, UUID> 
 
   long countByUserIdAndDeletedFalse(UUID userId);
 
+  boolean existsByNumberAndDeletedFalse(String number);
+
   @Query("SELECT c FROM PaymentCard c WHERE c.user.id = :userId AND c.deleted = false")
   List<PaymentCard> findAllCardsByUserId(@Param("userId") UUID userId);
 

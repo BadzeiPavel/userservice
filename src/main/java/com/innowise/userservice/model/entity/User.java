@@ -40,24 +40,15 @@ public class User extends BaseEntity {
   @Column(name = "id", nullable = false, updatable = false)
   private UUID id;
 
-  @NotBlank(message = "Name is required")
-  @Size(min = 1, max = 50, message = "Name must be between 1 and 50 characters")
   @Column(name = "name", nullable = false, length = 50)
   private String name;
 
-  @NotBlank(message = "Surname is required")
-  @Size(min = 1, max = 50, message = "Surname must be between 1 and 50 characters")
   @Column(name = "surname", nullable = false, length = 50)
   private String surname;
 
-  @NotNull(message = "Birth date is required")
-  @Past(message = "Birth date must be in the past")
   @Column(name = "birth_date", nullable = false)
   private LocalDate birthDate;
 
-  @NotBlank(message = "Email is required")
-  @Email(message = "Email must be valid")
-  @Size(max = 100, message = "Email must not exceed 100 characters")
   @Column(name = "email", nullable = false, unique = true, length = 100)
   private String email;
 

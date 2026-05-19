@@ -1,5 +1,7 @@
 server:
   port: ${USER_SERVICE_PORT:8081}
+app:
+  max-cards-per-user: 5
 spring:
   application:
     name: userservice
