@@ -25,4 +25,8 @@ public interface PaymentCardService {
   PaymentCardDto activateCard(UUID id);
 
   PaymentCardDto deactivateCard(UUID id);
+
+  PaymentCardDto softDeleteCard(UUID id);
+
+  PaymentCardDto hardDeleteCard(UUID id);
 }

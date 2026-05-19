@@ -1,7 +1,7 @@
 package com.innowise.userservice.controller;
 
-import com.innowise.userservice.model.dto.request.UserCreationDto;
 import com.innowise.userservice.model.dto.UserDto;
+import com.innowise.userservice.model.dto.request.UserCreationDto;
 import com.innowise.userservice.model.dto.request.UserPatchDto;
 import com.innowise.userservice.service.UserService;
 import jakarta.validation.Valid;
@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -63,5 +64,15 @@ public class UserController {
   @PutMapping("/{id}/deactivate")
   public ResponseEntity<UserDto> deactivateUser(@PathVariable UUID id) {
     return ResponseEntity.ok(userService.deactivateUser(id));
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<UserDto> softDeleteUser(@PathVariable UUID id) {
+    return ResponseEntity.ok(userService.softDeleteUser(id));
+  }
+
+  @DeleteMapping("/{id}/hard")
+  public ResponseEntity<UserDto> hardDeleteUser(@PathVariable UUID id) {
+    return ResponseEntity.ok(userService.hardDeleteUser(id));
   }
 }

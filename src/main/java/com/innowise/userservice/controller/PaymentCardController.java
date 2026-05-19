@@ -1,18 +1,18 @@
 package com.innowise.userservice.controller;
 
-import com.innowise.userservice.model.dto.request.PaymentCardCreationDto;
 import com.innowise.userservice.model.dto.PaymentCardDto;
+import com.innowise.userservice.model.dto.request.PaymentCardCreationDto;
 import com.innowise.userservice.model.dto.request.PaymentCardPatchDto;
 import com.innowise.userservice.model.dto.response.CardsListDto;
 import com.innowise.userservice.service.PaymentCardService;
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -75,5 +75,15 @@ public class PaymentCardController {
   @PutMapping("/{id}/deactivate")
   public ResponseEntity<PaymentCardDto> deactivateCard(@PathVariable UUID id) {
     return ResponseEntity.ok(cardService.deactivateCard(id));
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<PaymentCardDto> softDeleteCard(@PathVariable UUID id) {
+    return ResponseEntity.ok(cardService.softDeleteCard(id));
+  }
+
+  @DeleteMapping("/{id}/hard")
+  public ResponseEntity<PaymentCardDto> hardDeleteCard(@PathVariable UUID id) {
+    return ResponseEntity.ok(cardService.hardDeleteCard(id));
   }
 }

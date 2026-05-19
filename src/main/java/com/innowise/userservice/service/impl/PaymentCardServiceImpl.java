@@ -1,6 +1,7 @@
 package com.innowise.userservice.service.impl;
 
 import com.innowise.userservice.config.app.AppProperties;
+import com.innowise.userservice.config.cache.RedisConfig;
 import com.innowise.userservice.exception.DuplicateCardNumberException;
 import com.innowise.userservice.exception.EntityNotFoundException;
 import com.innowise.userservice.exception.MaxCardsExceededException;
@@ -21,6 +22,10 @@ import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -39,6 +44,10 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   private final EntityManager entityManager;
 
   @Override
+  @Caching(
+      put = @CachePut(value = RedisConfig.CARD_CACHE, key = "#result.id"),
+      evict = @CacheEvict(value = RedisConfig.USER_CACHE, key = "#userId")
+  )
   public PaymentCardDto createCard(UUID userId, PaymentCardCreationDto dto) {
     User user = userService.getUserEntityById(userId);
 
@@ -58,6 +67,7 @@ public class PaymentCardServiceImpl implements PaymentCardService {
 
   @Override
   @Transactional(readOnly = true)
+  @Cacheable(value = RedisConfig.CARD_CACHE, key = "#id")
   public PaymentCardDto getCardById(UUID id) {
     PaymentCard card = findCardById(id);
     return cardMapper.toPaymentCardDto(card);
@@ -89,6 +99,10 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   }
 
   @Override
+  @Caching(
+      put = @CachePut(value = RedisConfig.CARD_CACHE, key = "#id"),
+      evict = @CacheEvict(value = RedisConfig.USER_CACHE, key = "#result.userId")
+  )
   public PaymentCardDto updateCard(UUID id, PaymentCardPatchDto dto) {
     PaymentCard card = findCardById(id);
     PaymentCardUtil.update(card, dto);
@@ -97,6 +111,10 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   }
 
   @Override
+  @Caching(
+      put = @CachePut(value = RedisConfig.CARD_CACHE, key = "#id"),
+      evict = @CacheEvict(value = RedisConfig.USER_CACHE, key = "#result.userId")
+  )
   public PaymentCardDto activateCard(UUID id) {
     int rows = cardRepository.updateActiveStatus(id, true);
     if (rows == 0) {
@@ -106,12 +124,40 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   }
 
   @Override
+  @Caching(
+      put = @CachePut(value = RedisConfig.CARD_CACHE, key = "#id"),
+      evict = @CacheEvict(value = RedisConfig.USER_CACHE, key = "#result.userId")
+  )
   public PaymentCardDto deactivateCard(UUID id) {
     int rows = cardRepository.updateActiveStatus(id, false);
     if (rows == 0) {
       throw new EntityNotFoundException("Card not found with id: " + id);
     }
     return getCardById(id);
+  }
+
+  @Override
+  @Caching(evict = {
+      @CacheEvict(value = RedisConfig.CARD_CACHE, key = "#id"),
+      @CacheEvict(value = RedisConfig.USER_CACHE, key = "#result.userId")
+  })
+  public PaymentCardDto softDeleteCard(UUID id) {
+    PaymentCard card = findCardById(id);
+    card.setDeleted(true);
+    cardRepository.save(card);
+    return cardMapper.toPaymentCardDto(card);
+  }
+
+  @Override
+  @Caching(evict = {
+      @CacheEvict(value = RedisConfig.CARD_CACHE, key = "#id"),
+      @CacheEvict(value = RedisConfig.USER_CACHE, key = "#result.userId")
+  })
+  public PaymentCardDto hardDeleteCard(UUID id) {
+    PaymentCard card = findCardById(id);
+    PaymentCardDto deletedDto = cardMapper.toPaymentCardDto(card);
+    cardRepository.delete(card);
+    return deletedDto;
   }
 
   private PaymentCard findCardById(UUID id) {
