@@ -1,4 +1,4 @@
-package com.innowise.userservice.properties;
+package com.innowise.userservice.config.app;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

@@ -2,14 +2,15 @@ package com.innowise.userservice.service.impl;
 
 import com.innowise.userservice.exception.EntityNotFoundException;
 import com.innowise.userservice.mapper.UserMapper;
-import com.innowise.userservice.model.dto.UserCreationDto;
 import com.innowise.userservice.model.dto.UserDto;
-import com.innowise.userservice.model.dto.UserPatchDto;
+import com.innowise.userservice.model.dto.request.UserCreationDto;
+import com.innowise.userservice.model.dto.request.UserPatchDto;
 import com.innowise.userservice.model.entity.User;
 import com.innowise.userservice.repository.UserRepository;
 import com.innowise.userservice.repository.specification.SpecificationHelper;
 import com.innowise.userservice.repository.specification.UserSpecification;
 import com.innowise.userservice.service.UserService;
+import com.innowise.userservice.util.UserUtil;
 import jakarta.persistence.EntityManager;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -56,36 +57,27 @@ public class UserServiceImpl implements UserService {
   @Override
   public UserDto updateUser(UUID id, UserPatchDto dto) {
     User user = findUserById(id);
-    if (dto.name() != null) {
-      user.setName(dto.name());
-    }
-    if (dto.surname() != null) {
-      user.setSurname(dto.surname());
-    }
-    if (dto.birthDate() != null) {
-      user.setBirthDate(dto.birthDate());
-    }
-    if (dto.email() != null) {
-      user.setEmail(dto.email());
-    }
+    UserUtil.update(user, dto);
     user = userRepository.save(user);
     return userMapper.toUserDto(user);
   }
 
   @Override
-  public void activateUser(UUID id) {
+  public UserDto activateUser(UUID id) {
     int rows = userRepository.updateActiveStatus(id, true);
     if (rows == 0) {
       throw new EntityNotFoundException("User not found with id: " + id);
     }
+    return getUserById(id);
   }
 
   @Override
-  public void deactivateUser(UUID id) {
+  public UserDto deactivateUser(UUID id) {
     int rows = userRepository.updateActiveStatus(id, false);
     if (rows == 0) {
       throw new EntityNotFoundException("User not found with id: " + id);
     }
+    return getUserById(id);
   }
 
   @Override

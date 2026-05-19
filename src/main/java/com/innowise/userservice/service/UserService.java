@@ -1,8 +1,8 @@
 package com.innowise.userservice.service;
 
-import com.innowise.userservice.model.dto.UserCreationDto;
+import com.innowise.userservice.model.dto.request.UserCreationDto;
 import com.innowise.userservice.model.dto.UserDto;
-import com.innowise.userservice.model.dto.UserPatchDto;
+import com.innowise.userservice.model.dto.request.UserPatchDto;
 import com.innowise.userservice.model.entity.User;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -18,9 +18,9 @@ public interface UserService {
 
   UserDto updateUser(UUID id, UserPatchDto dto);
 
-  void activateUser(UUID id);
+  UserDto activateUser(UUID id);
 
-  void deactivateUser(UUID id);
+  UserDto deactivateUser(UUID id);
 
   User getUserEntityById(UUID id);
 }

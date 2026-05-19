@@ -1,4 +1,4 @@
-package com.innowise.userservice.model.dto;
+package com.innowise.userservice.model.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
