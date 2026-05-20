@@ -27,6 +27,11 @@ spring:
     default-schema: ${DATABASE_SCHEMA:user_schema}
     user: ${DATABASE_USERNAME:postgres}
     password: ${DATABASE_PASSWORD:postgres}
-#logging:
-#  level:
-#    liquibase: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
