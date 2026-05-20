@@ -62,7 +62,6 @@ jobs:
 
       - name: Run all tests (unit + integration)
         run: mvn -B verify
-        env:
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
