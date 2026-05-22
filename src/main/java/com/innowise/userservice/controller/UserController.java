@@ -56,23 +56,17 @@ public class UserController {
     return ResponseEntity.ok(userService.updateUser(id, dto));
   }
 
-  @PutMapping("/{id}/activate")
-  public ResponseEntity<UserDto> activateUser(@PathVariable UUID id) {
-    return ResponseEntity.ok(userService.activateUser(id));
-  }
-
-  @PutMapping("/{id}/deactivate")
-  public ResponseEntity<UserDto> deactivateUser(@PathVariable UUID id) {
-    return ResponseEntity.ok(userService.deactivateUser(id));
+  @PutMapping("/{id}")
+  public ResponseEntity<UserDto> changeUserActiveStatus(
+      @PathVariable UUID id,
+      @RequestParam(defaultValue = "true") boolean active) {
+    return ResponseEntity.ok(userService.changeUserActiveStatus(id, active));
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<UserDto> softDeleteUser(@PathVariable UUID id) {
-    return ResponseEntity.ok(userService.softDeleteUser(id));
-  }
-
-  @DeleteMapping("/{id}/hard")
-  public ResponseEntity<UserDto> hardDeleteUser(@PathVariable UUID id) {
-    return ResponseEntity.ok(userService.hardDeleteUser(id));
+  public ResponseEntity<UserDto> deleteUser(
+      @PathVariable UUID id,
+      @RequestParam(defaultValue = "false") boolean hardDeletion) {
+    return ResponseEntity.ok(userService.deleteUser(id, hardDeletion));
   }
 }

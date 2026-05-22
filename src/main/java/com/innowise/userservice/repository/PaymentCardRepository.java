@@ -23,13 +23,6 @@ public interface PaymentCardRepository extends JpaRepository<PaymentCard, UUID> 
 
   boolean existsByNumberAndDeletedFalse(String number);
 
-  @Query("SELECT c FROM PaymentCard c WHERE c.user.id = :userId AND c.deleted = false")
-  List<PaymentCard> findAllCardsByUserId(@Param("userId") UUID userId);
-
-  @Query(value = "SELECT * FROM payment_cards WHERE user_id = :userId AND deleted = false",
-      nativeQuery = true)
-  List<PaymentCard> findAllCardsByUserIdNative(@Param("userId") UUID userId);
-
   @Modifying
   @Query("UPDATE PaymentCard c SET c.active = :active WHERE c.id = :id")
   int updateActiveStatus(@Param("id") UUID id, @Param("active") boolean active);

@@ -1,8 +1,8 @@
 package com.innowise.userservice.service.impl.integration;
 
-import com.innowise.userservice.exception.EntityNotFoundException;
-import com.innowise.userservice.model.dto.request.UserCreationDto;
+import com.innowise.userservice.exception.UserServiceException;
 import com.innowise.userservice.model.dto.UserDto;
+import com.innowise.userservice.model.dto.request.UserCreationDto;
 import com.innowise.userservice.model.dto.request.UserPatchDto;
 import com.innowise.userservice.repository.UserRepository;
 import com.innowise.userservice.service.UserService;
@@ -67,11 +67,11 @@ class UserServiceImplIT extends BaseIntegrationTest {
   @Test
   void activateDeactivateUser_shouldToggleActive() {
     UserDto user = userService.createUser(TestDataFactory.createUserCreationDto("John", "Doe"));
-    userService.deactivateUser(user.id());
+    userService.changeUserActiveStatus(user.id(), false);
     UserDto deactivated = userService.getUserById(user.id());
     assertThat(deactivated.active()).isFalse();
 
-    userService.activateUser(user.id());
+    userService.changeUserActiveStatus(user.id(), true);
     UserDto activated = userService.getUserById(user.id());
     assertThat(activated.active()).isTrue();
   }
@@ -79,7 +79,7 @@ class UserServiceImplIT extends BaseIntegrationTest {
   @Test
   void softDeleteUser_shouldMarkDeleted() {
     UserDto user = userService.createUser(TestDataFactory.createUserCreationDto("John", "Doe"));
-    userService.softDeleteUser(user.id());
+    userService.deleteUser(user.id(), false);
     assertThat(userRepository.findByIdAndDeletedFalse(user.id())).isEmpty();
   }
 
@@ -87,13 +87,13 @@ class UserServiceImplIT extends BaseIntegrationTest {
   void hardDeleteUser_shouldRemoveFromDb() {
     UserDto user = userService.createUser(TestDataFactory.createUserCreationDto("John", "Doe"));
     UUID userId = user.id();
-    userService.hardDeleteUser(userId);
+    userService.deleteUser(userId, true);
     assertThat(userRepository.findById(userId)).isEmpty();
   }
 
   @Test
   void hardDeleteUser_shouldThrowIfNotFound() {
-    assertThatThrownBy(() -> userService.hardDeleteUser(UUID.randomUUID()))
-        .isInstanceOf(EntityNotFoundException.class);
+    assertThatThrownBy(() -> userService.deleteUser(UUID.randomUUID(), true))
+        .isInstanceOf(UserServiceException.class);
   }
 }

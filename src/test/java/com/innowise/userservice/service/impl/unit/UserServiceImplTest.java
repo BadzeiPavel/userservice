@@ -1,7 +1,7 @@
 package com.innowise.userservice.service.impl.unit;
 
 import com.innowise.userservice.config.cache.RedisConfig;
-import com.innowise.userservice.exception.EntityNotFoundException;
+import com.innowise.userservice.exception.UserServiceException;
 import com.innowise.userservice.mapper.UserMapper;
 import com.innowise.userservice.model.dto.UserDto;
 import com.innowise.userservice.model.dto.request.UserCreationDto;
@@ -81,7 +81,7 @@ class UserServiceImplTest {
   void getUserById_shouldThrowWhenNotFound() {
     when(userRepository.findByIdAndDeletedFalse(userId)).thenReturn(Optional.empty());
     assertThatThrownBy(() -> userService.getUserById(userId))
-        .isInstanceOf(EntityNotFoundException.class);
+        .isInstanceOf(UserServiceException.class);
   }
 
   @Test
@@ -100,7 +100,7 @@ class UserServiceImplTest {
     when(userRepository.updateActiveStatus(userId, true)).thenReturn(1);
     when(userRepository.findByIdAndDeletedFalse(userId)).thenReturn(Optional.of(userEntity));
     when(userMapper.toUserDto(userEntity)).thenReturn(userDto);
-    UserDto result = userService.activateUser(userId);
+    UserDto result = userService.changeUserActiveStatus(userId, true);
     assertThat(result.active()).isTrue();
   }
 
@@ -109,9 +109,8 @@ class UserServiceImplTest {
     when(userRepository.updateActiveStatus(userId, false)).thenReturn(1);
     when(userRepository.findByIdAndDeletedFalse(userId)).thenReturn(Optional.of(userEntity));
     when(userMapper.toUserDto(userEntity)).thenReturn(userDto);
-    UserDto result = userService.deactivateUser(userId);
-    assertThat(
-        result.active()).isTrue();
+    UserDto result = userService.changeUserActiveStatus(userId, false);
+    assertThat(result.active()).isTrue();
   }
 
   @Test
@@ -120,7 +119,7 @@ class UserServiceImplTest {
     when(userRepository.save(userEntity)).thenReturn(userEntity);
     when(userMapper.toUserDto(userEntity)).thenReturn(userDto);
 
-    UserDto result = userService.softDeleteUser(userId);
+    UserDto result = userService.deleteUser(userId, false);
     assertThat(userEntity.isDeleted()).isTrue();
   }
 
@@ -138,7 +137,7 @@ class UserServiceImplTest {
     when(userRepository.findByIdAndDeletedFalse(userId)).thenReturn(Optional.of(userWithCards));
     when(userMapper.toUserDto(userWithCards)).thenReturn(userDto);
 
-    userService.hardDeleteUser(userId);
+    userService.deleteUser(userId, true);
     verify(userRepository).delete(userWithCards);
   }
 }

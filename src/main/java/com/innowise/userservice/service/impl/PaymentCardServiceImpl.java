@@ -2,9 +2,7 @@ package com.innowise.userservice.service.impl;
 
 import com.innowise.userservice.config.app.AppProperties;
 import com.innowise.userservice.config.cache.RedisConfig;
-import com.innowise.userservice.exception.DuplicateCardNumberException;
-import com.innowise.userservice.exception.EntityNotFoundException;
-import com.innowise.userservice.exception.MaxCardsExceededException;
+import com.innowise.userservice.exception.UserServiceException;
 import com.innowise.userservice.mapper.PaymentCardMapper;
 import com.innowise.userservice.model.dto.PaymentCardDto;
 import com.innowise.userservice.model.dto.request.PaymentCardCreationDto;
@@ -17,7 +15,6 @@ import com.innowise.userservice.repository.specification.PaymentCardSpecificatio
 import com.innowise.userservice.repository.specification.SpecificationHelper;
 import com.innowise.userservice.service.PaymentCardService;
 import com.innowise.userservice.service.UserService;
-import com.innowise.userservice.util.PaymentCardUtil;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.UUID;
@@ -52,11 +49,11 @@ public class PaymentCardServiceImpl implements PaymentCardService {
     User user = userService.getUserEntityById(userId);
 
     if (cardRepository.countByUserIdAndDeletedFalse(userId) >= appProperties.maxCardsPerUser()) {
-      throw new MaxCardsExceededException(
+      throw new UserServiceException(
           "User already has the maximum number of cards (" + appProperties.maxCardsPerUser() + ")");
     }
     if (cardRepository.existsByNumberAndDeletedFalse(dto.number())) {
-      throw new DuplicateCardNumberException("Card number already exists: " + dto.number());
+      throw new UserServiceException("Card number already exists: " + dto.number());
     }
 
     PaymentCard card = cardMapper.toPaymentCard(dto);
@@ -105,7 +102,16 @@ public class PaymentCardServiceImpl implements PaymentCardService {
   )
   public PaymentCardDto updateCard(UUID id, PaymentCardPatchDto dto) {
     PaymentCard card = findCardById(id);
-    PaymentCardUtil.update(card, dto);
+    if (dto.number() != null) {
+      card.setNumber(dto.number());
+    }
+    if (dto.holder() != null) {
+      card.setHolder(dto.holder());
+    }
+    if (dto.expirationDate() != null) {
+      card.setExpirationDate(dto.expirationDate());
+    }
+
     card = cardRepository.save(card);
     return cardMapper.toPaymentCardDto(card);
   }
@@ -115,23 +121,22 @@ public class PaymentCardServiceImpl implements PaymentCardService {
       put = @CachePut(value = RedisConfig.CARD_CACHE, key = "#id"),
       evict = @CacheEvict(value = RedisConfig.USER_CACHE, key = "#result.userId")
   )
-  public PaymentCardDto activateCard(UUID id) {
+  public PaymentCardDto changeCardActiveStatus(UUID id, boolean active) {
+    return active ? activateCard(id) : deactivateCard(id);
+  }
+
+  private PaymentCardDto activateCard(UUID id) {
     int rows = cardRepository.updateActiveStatus(id, true);
     if (rows == 0) {
-      throw new EntityNotFoundException("Card not found with id: " + id);
+      throw new UserServiceException("Card not found with id: " + id);
     }
     return getCardById(id);
   }
 
-  @Override
-  @Caching(
-      put = @CachePut(value = RedisConfig.CARD_CACHE, key = "#id"),
-      evict = @CacheEvict(value = RedisConfig.USER_CACHE, key = "#result.userId")
-  )
-  public PaymentCardDto deactivateCard(UUID id) {
+  private PaymentCardDto deactivateCard(UUID id) {
     int rows = cardRepository.updateActiveStatus(id, false);
     if (rows == 0) {
-      throw new EntityNotFoundException("Card not found with id: " + id);
+      throw new UserServiceException("Card not found with id: " + id);
     }
     return getCardById(id);
   }
@@ -141,19 +146,18 @@ public class PaymentCardServiceImpl implements PaymentCardService {
       @CacheEvict(value = RedisConfig.CARD_CACHE, key = "#id"),
       @CacheEvict(value = RedisConfig.USER_CACHE, key = "#result.userId")
   })
-  public PaymentCardDto softDeleteCard(UUID id) {
+  public PaymentCardDto deleteCard(UUID id, boolean hardDeletion) {
+    return hardDeletion ? hardDeleteCard(id) : softDeleteCard(id);
+  }
+
+  private PaymentCardDto softDeleteCard(UUID id) {
     PaymentCard card = findCardById(id);
     card.setDeleted(true);
     cardRepository.save(card);
     return cardMapper.toPaymentCardDto(card);
   }
 
-  @Override
-  @Caching(evict = {
-      @CacheEvict(value = RedisConfig.CARD_CACHE, key = "#id"),
-      @CacheEvict(value = RedisConfig.USER_CACHE, key = "#result.userId")
-  })
-  public PaymentCardDto hardDeleteCard(UUID id) {
+  private PaymentCardDto hardDeleteCard(UUID id) {
     PaymentCard card = findCardById(id);
     PaymentCardDto deletedDto = cardMapper.toPaymentCardDto(card);
     cardRepository.delete(card);
@@ -162,6 +166,6 @@ public class PaymentCardServiceImpl implements PaymentCardService {
 
   private PaymentCard findCardById(UUID id) {
     return cardRepository.findByIdAndDeletedFalse(id)
-        .orElseThrow(() -> new EntityNotFoundException("Card not found with id: " + id));
+        .orElseThrow(() -> new UserServiceException("Card not found with id: " + id));
   }
 }

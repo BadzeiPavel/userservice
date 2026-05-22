@@ -1,9 +1,7 @@
 package com.innowise.userservice.service.impl.integration;
 
 import com.innowise.userservice.config.app.AppProperties;
-import com.innowise.userservice.exception.DuplicateCardNumberException;
-import com.innowise.userservice.exception.EntityNotFoundException;
-import com.innowise.userservice.exception.MaxCardsExceededException;
+import com.innowise.userservice.exception.UserServiceException;
 import com.innowise.userservice.model.dto.PaymentCardDto;
 import com.innowise.userservice.model.dto.UserDto;
 import com.innowise.userservice.model.dto.request.PaymentCardCreationDto;
@@ -69,7 +67,7 @@ class PaymentCardServiceImplIT extends BaseIntegrationTest {
     PaymentCardCreationDto extra = TestDataFactory.createCardCreationDto("0000000000000000",
         "Extra");
     assertThatThrownBy(() -> cardService.createCard(testUser.id(), extra))
-        .isInstanceOf(MaxCardsExceededException.class);
+        .isInstanceOf(UserServiceException.class);
   }
 
   @Test
@@ -77,7 +75,7 @@ class PaymentCardServiceImplIT extends BaseIntegrationTest {
     PaymentCardCreationDto dto = TestDataFactory.createCardCreationDto(testCard.number(),
         "Someone");
     assertThatThrownBy(() -> cardService.createCard(testUser.id(), dto))
-        .isInstanceOf(DuplicateCardNumberException.class);
+        .isInstanceOf(UserServiceException.class);
   }
 
   @Test
@@ -118,31 +116,31 @@ class PaymentCardServiceImplIT extends BaseIntegrationTest {
 
   @Test
   void activateDeactivateCard_shouldToggleActive() {
-    cardService.deactivateCard(testCard.id());
+    cardService.changeCardActiveStatus(testCard.id(), false);
     PaymentCardDto deactivated = cardService.getCardById(testCard.id());
     assertThat(deactivated.active()).isFalse();
 
-    cardService.activateCard(testCard.id());
+    cardService.changeCardActiveStatus(testCard.id(), true);
     PaymentCardDto activated = cardService.getCardById(testCard.id());
     assertThat(activated.active()).isTrue();
   }
 
   @Test
   void softDeleteCard_shouldMarkDeleted() {
-    cardService.softDeleteCard(testCard.id());
+    cardService.deleteCard(testCard.id(), false);
     assertThat(cardRepository.findByIdAndDeletedFalse(testCard.id())).isEmpty();
   }
 
   @Test
   void hardDeleteCard_shouldRemoveFromDb() {
     UUID cardId = testCard.id();
-    cardService.hardDeleteCard(cardId);
+    cardService.deleteCard(cardId, true);
     assertThat(cardRepository.findById(cardId)).isEmpty();
   }
 
   @Test
   void hardDeleteCard_shouldThrowIfNotFound() {
-    assertThatThrownBy(() -> cardService.hardDeleteCard(UUID.randomUUID()))
-        .isInstanceOf(EntityNotFoundException.class);
+    assertThatThrownBy(() -> cardService.deleteCard(UUID.randomUUID(), true))
+        .isInstanceOf(UserServiceException.class);
   }
 }

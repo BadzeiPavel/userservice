@@ -22,11 +22,7 @@ public interface PaymentCardService {
 
   PaymentCardDto updateCard(UUID id, PaymentCardPatchDto dto);
 
-  PaymentCardDto activateCard(UUID id);
+  PaymentCardDto changeCardActiveStatus(UUID id, boolean active);
 
-  PaymentCardDto deactivateCard(UUID id);
-
-  PaymentCardDto softDeleteCard(UUID id);
-
-  PaymentCardDto hardDeleteCard(UUID id);
+  PaymentCardDto deleteCard(UUID id, boolean hardDeletion);
 }

@@ -20,11 +20,7 @@ public interface UserService {
 
   UserDto updateUser(UUID id, UserPatchDto dto);
 
-  UserDto activateUser(UUID id);
+  UserDto changeUserActiveStatus(UUID id, boolean active);
 
-  UserDto deactivateUser(UUID id);
-
-  UserDto softDeleteUser(UUID id);
-
-  UserDto hardDeleteUser(UUID id);
+  UserDto deleteUser(UUID id, boolean hardDeletion);
 }

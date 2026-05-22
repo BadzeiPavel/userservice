@@ -1,7 +1,7 @@
 package com.innowise.userservice.service.impl;
 
 import com.innowise.userservice.config.cache.RedisConfig;
-import com.innowise.userservice.exception.EntityNotFoundException;
+import com.innowise.userservice.exception.UserServiceException;
 import com.innowise.userservice.mapper.UserMapper;
 import com.innowise.userservice.model.dto.UserDto;
 import com.innowise.userservice.model.dto.request.UserCreationDto;
@@ -11,7 +11,6 @@ import com.innowise.userservice.repository.UserRepository;
 import com.innowise.userservice.repository.specification.SpecificationHelper;
 import com.innowise.userservice.repository.specification.UserSpecification;
 import com.innowise.userservice.service.UserService;
-import com.innowise.userservice.util.UserUtil;
 import jakarta.persistence.EntityManager;
 import java.util.Objects;
 import java.util.UUID;
@@ -68,27 +67,41 @@ public class UserServiceImpl implements UserService {
   @CachePut(value = RedisConfig.USER_CACHE, key = "#id")
   public UserDto updateUser(UUID id, UserPatchDto dto) {
     User user = findUserById(id);
-    UserUtil.update(user, dto);
+    if (dto.name() != null) {
+      user.setName(dto.name());
+    }
+    if (dto.surname() != null) {
+      user.setSurname(dto.surname());
+    }
+    if (dto.birthDate() != null) {
+      user.setBirthDate(dto.birthDate());
+    }
+    if (dto.email() != null) {
+      user.setEmail(dto.email());
+    }
+
     user = userRepository.save(user);
     return userMapper.toUserDto(user);
   }
 
   @Override
   @CachePut(value = RedisConfig.USER_CACHE, key = "#id")
-  public UserDto activateUser(UUID id) {
+  public UserDto changeUserActiveStatus(UUID id, boolean active) {
+    return active ? activateUser(id) : deactivateUser(id);
+  }
+
+  private UserDto activateUser(UUID id) {
     int rows = userRepository.updateActiveStatus(id, true);
     if (rows == 0) {
-      throw new EntityNotFoundException("User not found with id: " + id);
+      throw new UserServiceException("User not found with id: " + id);
     }
     return getUserById(id);
   }
 
-  @Override
-  @CachePut(value = RedisConfig.USER_CACHE, key = "#id")
-  public UserDto deactivateUser(UUID id) {
+  private UserDto deactivateUser(UUID id) {
     int rows = userRepository.updateActiveStatus(id, false);
     if (rows == 0) {
-      throw new EntityNotFoundException("User not found with id: " + id);
+      throw new UserServiceException("User not found with id: " + id);
     }
     return getUserById(id);
   }
@@ -103,18 +116,18 @@ public class UserServiceImpl implements UserService {
   @Caching(evict = {
       @CacheEvict(value = RedisConfig.USER_CACHE, key = "#id")
   })
-  public UserDto softDeleteUser(UUID id) {
+  public UserDto deleteUser(UUID id, boolean hardDeletion) {
+    return hardDeletion ? hardDeleteUser(id) : softDeleteUser(id);
+  }
+
+  private UserDto softDeleteUser(UUID id) {
     User user = findUserById(id);
     user.setDeleted(true);
     userRepository.save(user);
     return userMapper.toUserDto(user);
   }
 
-  @Override
-  @Caching(evict = {
-      @CacheEvict(value = RedisConfig.USER_CACHE, key = "#id")
-  })
-  public UserDto hardDeleteUser(UUID id) {
+  private UserDto hardDeleteUser(UUID id) {
     User user = findUserById(id);
     UserDto deletedDto = userMapper.toUserDto(user);
 
@@ -130,6 +143,6 @@ public class UserServiceImpl implements UserService {
 
   private User findUserById(UUID id) {
     return userRepository.findByIdAndDeletedFalse(id)
-        .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+        .orElseThrow(() -> new UserServiceException("User not found with id: " + id));
   }
 }

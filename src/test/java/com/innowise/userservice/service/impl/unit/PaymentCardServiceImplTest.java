@@ -2,8 +2,7 @@ package com.innowise.userservice.service.impl.unit;
 
 import com.innowise.userservice.config.app.AppProperties;
 import com.innowise.userservice.config.cache.RedisConfig;
-import com.innowise.userservice.exception.DuplicateCardNumberException;
-import com.innowise.userservice.exception.MaxCardsExceededException;
+import com.innowise.userservice.exception.UserServiceException;
 import com.innowise.userservice.mapper.PaymentCardMapper;
 import com.innowise.userservice.model.dto.PaymentCardDto;
 import com.innowise.userservice.model.dto.request.PaymentCardCreationDto;
@@ -97,7 +96,7 @@ class PaymentCardServiceImplTest {
     when(userService.getUserEntityById(userId)).thenReturn(userEntity);
     when(cardRepository.countByUserIdAndDeletedFalse(userId)).thenReturn(5L);
     assertThatThrownBy(() -> cardService.createCard(userId, mock(PaymentCardCreationDto.class)))
-        .isInstanceOf(MaxCardsExceededException.class);
+        .isInstanceOf(UserServiceException.class);
   }
 
   @Test
@@ -107,7 +106,7 @@ class PaymentCardServiceImplTest {
     when(cardRepository.existsByNumberAndDeletedFalse("dup")).thenReturn(true);
     PaymentCardCreationDto dto = new PaymentCardCreationDto("dup", "Holder", null);
     assertThatThrownBy(() -> cardService.createCard(userId, dto))
-        .isInstanceOf(DuplicateCardNumberException.class);
+        .isInstanceOf(UserServiceException.class);
   }
 
   @Test
@@ -135,7 +134,7 @@ class PaymentCardServiceImplTest {
     when(cardRepository.findByIdAndDeletedFalse(cardId)).thenReturn(Optional.of(cardEntity));
     when(cardMapper.toPaymentCardDto(cardEntity)).thenReturn(cardDto);
 
-    cardService.activateCard(cardId);
+    cardService.changeCardActiveStatus(cardId, true);
     verify(cardRepository).updateActiveStatus(cardId, true);
   }
 
@@ -145,7 +144,7 @@ class PaymentCardServiceImplTest {
     when(cardRepository.save(cardEntity)).thenReturn(cardEntity);
     when(cardMapper.toPaymentCardDto(cardEntity)).thenReturn(cardDto);
 
-    cardService.softDeleteCard(cardId);
+    cardService.deleteCard(cardId, false);
     assertThat(cardEntity.isDeleted()).isTrue();
   }
 
@@ -154,7 +153,7 @@ class PaymentCardServiceImplTest {
     when(cardRepository.findByIdAndDeletedFalse(cardId)).thenReturn(Optional.of(cardEntity));
     when(cardMapper.toPaymentCardDto(cardEntity)).thenReturn(cardDto);
 
-    cardService.hardDeleteCard(cardId);
+    cardService.deleteCard(cardId, true);
     verify(cardRepository).delete(cardEntity);
   }
 }

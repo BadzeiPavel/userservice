@@ -67,23 +67,17 @@ public class PaymentCardController {
     return ResponseEntity.ok(cardService.updateCard(id, dto));
   }
 
-  @PutMapping("/{id}/activate")
-  public ResponseEntity<PaymentCardDto> activateCard(@PathVariable UUID id) {
-    return ResponseEntity.ok(cardService.activateCard(id));
-  }
-
-  @PutMapping("/{id}/deactivate")
-  public ResponseEntity<PaymentCardDto> deactivateCard(@PathVariable UUID id) {
-    return ResponseEntity.ok(cardService.deactivateCard(id));
+  @PutMapping("/{id}")
+  public ResponseEntity<PaymentCardDto> changeCardActiveStatus(
+      @PathVariable UUID id,
+      @RequestParam(defaultValue = "true") boolean active) {
+    return ResponseEntity.ok(cardService.changeCardActiveStatus(id, active));
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<PaymentCardDto> softDeleteCard(@PathVariable UUID id) {
-    return ResponseEntity.ok(cardService.softDeleteCard(id));
-  }
-
-  @DeleteMapping("/{id}/hard")
-  public ResponseEntity<PaymentCardDto> hardDeleteCard(@PathVariable UUID id) {
-    return ResponseEntity.ok(cardService.hardDeleteCard(id));
+  public ResponseEntity<PaymentCardDto> deleteCard(
+      @PathVariable UUID id,
+      @RequestParam(defaultValue = "false") boolean hardDeletion) {
+    return ResponseEntity.ok(cardService.deleteCard(id, hardDeletion));
   }
 }
