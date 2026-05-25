@@ -3,10 +3,8 @@ name: User Service CI Pipeline
 on:
   push:
     branches:
-      - '**'
-  pull_request:
-    branches:
       - main
+  pull_request:
 
 env:
   REGISTRY: ghcr.io
