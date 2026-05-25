@@ -1,16 +1,16 @@
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:5432/store?currentSchema=user_schema
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:store}?currentSchema=${DATABASE_SCHEMA:user_schema}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
   liquibase:
-    url: jdbc:postgresql://postgres:5432/store?currentSchema=user_schema
-    user: postgres
-    password: postgres
+    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:store}?currentSchema=${DATABASE_SCHEMA:user_schema}
+    user: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
   data:
     redis:
-      host: redis
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 management:
   endpoints:
     web:

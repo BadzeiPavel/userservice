@@ -49,12 +49,7 @@ public class PaymentCardController {
   }
 
   @GetMapping
-  public ResponseEntity<Page<PaymentCardDto>> getAllCardsWithPagination(Pageable pageable) {
-    return ResponseEntity.ok(cardService.getAllCardsWithPagination(pageable));
-  }
-
-  @GetMapping("/filter")
-  public ResponseEntity<Page<PaymentCardDto>> getCardsFiltered(
+  public ResponseEntity<Page<PaymentCardDto>> getCards(
       @RequestParam(required = false) String holder,
       Pageable pageable) {
     return ResponseEntity.ok(cardService.getCardsFiltered(holder, pageable));
@@ -75,9 +70,10 @@ public class PaymentCardController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<PaymentCardDto> deleteCard(
+  public ResponseEntity<Void> deleteCard(
       @PathVariable UUID id,
       @RequestParam(defaultValue = "false") boolean hardDeletion) {
-    return ResponseEntity.ok(cardService.deleteCard(id, hardDeletion));
+    cardService.deleteCard(id, hardDeletion);
+    return ResponseEntity.noContent().build();
   }
 }

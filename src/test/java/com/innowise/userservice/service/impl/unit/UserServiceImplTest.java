@@ -1,6 +1,5 @@
 package com.innowise.userservice.service.impl.unit;
 
-import com.innowise.userservice.config.cache.RedisConfig;
 import com.innowise.userservice.exception.UserServiceException;
 import com.innowise.userservice.mapper.UserMapper;
 import com.innowise.userservice.model.dto.UserDto;
@@ -19,12 +18,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -106,11 +103,21 @@ class UserServiceImplTest {
 
   @Test
   void deactivateUser_shouldSetActiveFalse() {
+    User deactivatedEntity = new User();
+    deactivatedEntity.setId(userId);
+    deactivatedEntity.setActive(false);
+    UserDto deactivatedDto = new UserDto(
+        userId, "John", "Doe", null, "john@example.com",
+        false, null, null, null
+    );
+
     when(userRepository.updateActiveStatus(userId, false)).thenReturn(1);
-    when(userRepository.findByIdAndDeletedFalse(userId)).thenReturn(Optional.of(userEntity));
-    when(userMapper.toUserDto(userEntity)).thenReturn(userDto);
+    when(userRepository.findByIdAndDeletedFalse(userId))
+        .thenReturn(Optional.of(deactivatedEntity));
+    when(userMapper.toUserDto(deactivatedEntity)).thenReturn(deactivatedDto);
+
     UserDto result = userService.changeUserActiveStatus(userId, false);
-    assertThat(result.active()).isTrue();
+    assertThat(result.active()).isFalse();
   }
 
   @Test
@@ -124,10 +131,7 @@ class UserServiceImplTest {
   }
 
   @Test
-  void hardDeleteUser_shouldDeleteAndEvictCardCaches() {
-    Cache cardCache = mock(Cache.class);
-    when(cacheManager.getCache(RedisConfig.CARD_CACHE)).thenReturn(cardCache);
-
+  void hardDeleteUser_shouldDelete() {
     User userWithCards = new User();
     userWithCards.setId(userId);
     PaymentCard card = new PaymentCard();

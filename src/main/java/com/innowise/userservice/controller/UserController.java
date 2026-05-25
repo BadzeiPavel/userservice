@@ -64,9 +64,10 @@ public class UserController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<UserDto> deleteUser(
+  public ResponseEntity<Void> deleteUser(
       @PathVariable UUID id,
       @RequestParam(defaultValue = "false") boolean hardDeletion) {
-    return ResponseEntity.ok(userService.deleteUser(id, hardDeletion));
+    userService.deleteUser(id, hardDeletion);
+    return ResponseEntity.noContent().build();
   }
 }

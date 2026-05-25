@@ -34,7 +34,6 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final EntityManager entityManager;
   private final UserMapper userMapper;
-  private final CacheManager cacheManager;
 
   @Override
   @CachePut(value = RedisConfig.USER_CACHE, key = "#result.id")
@@ -95,7 +94,7 @@ public class UserServiceImpl implements UserService {
     if (rows == 0) {
       throw new UserServiceException("User not found with id: " + id);
     }
-    return getUserById(id);
+    return userMapper.toUserDto(findUserById(id));
   }
 
   private UserDto deactivateUser(UUID id) {
@@ -103,13 +102,7 @@ public class UserServiceImpl implements UserService {
     if (rows == 0) {
       throw new UserServiceException("User not found with id: " + id);
     }
-    return getUserById(id);
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public User getUserEntityById(UUID id) {
-    return findUserById(id);
+    return userMapper.toUserDto(findUserById(id));
   }
 
   @Override
@@ -130,13 +123,6 @@ public class UserServiceImpl implements UserService {
   private UserDto hardDeleteUser(UUID id) {
     User user = findUserById(id);
     UserDto deletedDto = userMapper.toUserDto(user);
-
-    if (user.getPaymentCards() != null) {
-      user.getPaymentCards().forEach(card ->
-          Objects.requireNonNull(cacheManager.getCache(RedisConfig.CARD_CACHE)).evict(card.getId())
-      );
-    }
-
     userRepository.delete(user);
     return deletedDto;
   }

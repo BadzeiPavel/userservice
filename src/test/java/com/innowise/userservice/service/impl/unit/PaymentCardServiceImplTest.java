@@ -1,10 +1,11 @@
 package com.innowise.userservice.service.impl.unit;
 
 import com.innowise.userservice.config.app.AppProperties;
-import com.innowise.userservice.config.cache.RedisConfig;
 import com.innowise.userservice.exception.UserServiceException;
 import com.innowise.userservice.mapper.PaymentCardMapper;
+import com.innowise.userservice.mapper.UserMapper;
 import com.innowise.userservice.model.dto.PaymentCardDto;
+import com.innowise.userservice.model.dto.UserDto;
 import com.innowise.userservice.model.dto.request.PaymentCardCreationDto;
 import com.innowise.userservice.model.dto.request.PaymentCardPatchDto;
 import com.innowise.userservice.model.entity.PaymentCard;
@@ -12,7 +13,6 @@ import com.innowise.userservice.model.entity.User;
 import com.innowise.userservice.repository.PaymentCardRepository;
 import com.innowise.userservice.service.UserService;
 import com.innowise.userservice.service.impl.PaymentCardServiceImpl;
-import jakarta.persistence.EntityManager;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,8 +21,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -43,16 +41,14 @@ class PaymentCardServiceImplTest {
   @Mock
   private PaymentCardMapper cardMapper;
   @Mock
-  private EntityManager entityManager;
-  @Mock
-  private CacheManager cacheManager;
+  private UserMapper userMapper;
 
   @InjectMocks
   private PaymentCardServiceImpl cardService;
 
   private UUID userId;
   private UUID cardId;
-  private User userEntity;
+  private UserDto userDto;
   private PaymentCard cardEntity;
   private PaymentCardDto cardDto;
 
@@ -60,8 +56,11 @@ class PaymentCardServiceImplTest {
   void setUp() {
     userId = UUID.randomUUID();
     cardId = UUID.randomUUID();
-    userEntity = new User();
+    User userEntity = new User();
     userEntity.setId(userId);
+    userDto = UserDto.builder()
+        .id(userId)
+        .build();
     cardEntity = new PaymentCard();
     cardEntity.setId(cardId);
     cardEntity.setUser(userEntity);
@@ -69,17 +68,13 @@ class PaymentCardServiceImplTest {
         null);
 
     lenient().when(appProperties.maxCardsPerUser()).thenReturn(5);
-
-    Cache userCache = mock(Cache.class);
-    lenient().when(cacheManager.getCache(RedisConfig.USER_CACHE)).thenReturn(userCache);
-    lenient().when(cacheManager.getCache(RedisConfig.CARD_CACHE)).thenReturn(mock(Cache.class));
   }
 
   @Test
   void createCard_shouldSaveAndReturnDto() {
     PaymentCardCreationDto creationDto = new PaymentCardCreationDto("1234567890123456", "John",
         null);
-    when(userService.getUserEntityById(userId)).thenReturn(userEntity);
+    when(userService.getUserById(userId)).thenReturn(userDto);
     when(cardRepository.countByUserIdAndDeletedFalse(userId)).thenReturn(2L);
     when(cardRepository.existsByNumberAndDeletedFalse("1234567890123456")).thenReturn(false);
     when(cardMapper.toPaymentCard(creationDto)).thenReturn(cardEntity);
@@ -93,7 +88,7 @@ class PaymentCardServiceImplTest {
 
   @Test
   void createCard_shouldThrowWhenMaxExceeded() {
-    when(userService.getUserEntityById(userId)).thenReturn(userEntity);
+    when(userService.getUserById(userId)).thenReturn(userDto);
     when(cardRepository.countByUserIdAndDeletedFalse(userId)).thenReturn(5L);
     assertThatThrownBy(() -> cardService.createCard(userId, mock(PaymentCardCreationDto.class)))
         .isInstanceOf(UserServiceException.class);
@@ -101,7 +96,7 @@ class PaymentCardServiceImplTest {
 
   @Test
   void createCard_shouldThrowWhenDuplicateNumber() {
-    when(userService.getUserEntityById(userId)).thenReturn(userEntity);
+    when(userService.getUserById(userId)).thenReturn(userDto);
     when(cardRepository.countByUserIdAndDeletedFalse(userId)).thenReturn(1L);
     when(cardRepository.existsByNumberAndDeletedFalse("dup")).thenReturn(true);
     PaymentCardCreationDto dto = new PaymentCardCreationDto("dup", "Holder", null);

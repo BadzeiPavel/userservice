@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
   public ResponseEntity<ErrorResponse> handleNotFound(UserServiceException ex,
       HttpServletRequest request) {
     return buildResponse("User service exception", ex.getMessage(), ex.getClass().getSimpleName(),
-        HttpStatus.NOT_FOUND, request);
+        HttpStatus.INTERNAL_SERVER_ERROR, request);
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
@@ -40,7 +40,9 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, HttpServletRequest request) {
-    return buildResponse("Internal Server Error", ex.getMessage(), ex.getClass().getSimpleName(),
+    return buildResponse("Internal Server Error",
+        "An unexpected error occurred",
+        ex.getClass().getSimpleName(),
         HttpStatus.INTERNAL_SERVER_ERROR, request);
   }
 
