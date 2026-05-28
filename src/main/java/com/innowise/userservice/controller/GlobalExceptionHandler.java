@@ -1,7 +1,7 @@
 package com.innowise.userservice.controller;
 
+import com.innowise.common.model.dto.response.ErrorResponse;
 import com.innowise.userservice.exception.UserServiceException;
-import com.innowise.userservice.model.dto.response.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
@@ -49,14 +49,14 @@ public class GlobalExceptionHandler {
   private ResponseEntity<ErrorResponse> buildResponse(String title, String message,
       String exceptionName,
       HttpStatus status, HttpServletRequest request) {
-    ErrorResponse response = new ErrorResponse(
-        title,
-        exceptionName,
-        status.value(),
-        message,
-        request.getRequestURI(),
-        LocalDateTime.now()
-    );
+    ErrorResponse response = ErrorResponse.builder().
+        title(title).
+        name(exceptionName).
+        status(status.value()).
+        message(message).
+        path(request.getRequestURI()).
+        timestamp(LocalDateTime.now())
+        .build();
     return new ResponseEntity<>(response, status);
   }
 }

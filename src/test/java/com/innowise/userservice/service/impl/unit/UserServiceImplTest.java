@@ -2,8 +2,8 @@ package com.innowise.userservice.service.impl.unit;
 
 import com.innowise.userservice.exception.UserServiceException;
 import com.innowise.userservice.mapper.UserMapper;
-import com.innowise.userservice.model.dto.UserDto;
-import com.innowise.userservice.model.dto.request.UserCreationDto;
+import com.innowise.common.model.dto.UserDto;
+import com.innowise.common.model.dto.request.UserCreationDto;
 import com.innowise.userservice.model.dto.request.UserPatchDto;
 import com.innowise.userservice.model.entity.PaymentCard;
 import com.innowise.userservice.model.entity.User;

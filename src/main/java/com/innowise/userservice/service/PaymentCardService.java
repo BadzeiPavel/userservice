@@ -1,6 +1,6 @@
 package com.innowise.userservice.service;
 
-import com.innowise.userservice.model.dto.PaymentCardDto;
+import com.innowise.common.model.dto.PaymentCardDto;
 import com.innowise.userservice.model.dto.request.PaymentCardCreationDto;
 import com.innowise.userservice.model.dto.request.PaymentCardPatchDto;
 import com.innowise.userservice.model.dto.response.CardsListDto;

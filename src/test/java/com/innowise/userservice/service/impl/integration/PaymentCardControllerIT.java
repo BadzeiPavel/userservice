@@ -1,7 +1,7 @@
 package com.innowise.userservice.service.impl.integration;
 
-import com.innowise.userservice.model.dto.PaymentCardDto;
-import com.innowise.userservice.model.dto.UserDto;
+import com.innowise.common.model.dto.PaymentCardDto;
+import com.innowise.common.model.dto.UserDto;
 import com.innowise.userservice.model.dto.request.PaymentCardCreationDto;
 import com.innowise.userservice.model.dto.request.PaymentCardPatchDto;
 import com.innowise.userservice.repository.PaymentCardRepository;

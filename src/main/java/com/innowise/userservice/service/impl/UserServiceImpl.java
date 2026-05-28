@@ -1,10 +1,10 @@
 package com.innowise.userservice.service.impl;
 
+import com.innowise.common.model.dto.request.UserCreationDto;
 import com.innowise.userservice.config.cache.RedisConfig;
 import com.innowise.userservice.exception.UserServiceException;
 import com.innowise.userservice.mapper.UserMapper;
-import com.innowise.userservice.model.dto.UserDto;
-import com.innowise.userservice.model.dto.request.UserCreationDto;
+import com.innowise.common.model.dto.UserDto;
 import com.innowise.userservice.model.dto.request.UserPatchDto;
 import com.innowise.userservice.model.entity.User;
 import com.innowise.userservice.repository.UserRepository;
@@ -12,10 +12,8 @@ import com.innowise.userservice.repository.specification.SpecificationHelper;
 import com.innowise.userservice.repository.specification.UserSpecification;
 import com.innowise.userservice.service.UserService;
 import jakarta.persistence.EntityManager;
-import java.util.Objects;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;

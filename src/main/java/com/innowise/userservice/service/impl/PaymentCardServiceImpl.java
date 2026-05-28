@@ -1,16 +1,15 @@
 package com.innowise.userservice.service.impl;
 
+import com.innowise.common.model.dto.PaymentCardDto;
+import com.innowise.common.model.dto.UserDto;
 import com.innowise.userservice.config.app.AppProperties;
 import com.innowise.userservice.exception.UserServiceException;
 import com.innowise.userservice.mapper.PaymentCardMapper;
 import com.innowise.userservice.mapper.UserMapper;
-import com.innowise.userservice.model.dto.PaymentCardDto;
-import com.innowise.userservice.model.dto.UserDto;
 import com.innowise.userservice.model.dto.request.PaymentCardCreationDto;
 import com.innowise.userservice.model.dto.request.PaymentCardPatchDto;
 import com.innowise.userservice.model.dto.response.CardsListDto;
 import com.innowise.userservice.model.entity.PaymentCard;
-import com.innowise.userservice.model.entity.User;
 import com.innowise.userservice.repository.PaymentCardRepository;
 import com.innowise.userservice.repository.specification.PaymentCardSpecification;
 import com.innowise.userservice.repository.specification.SpecificationHelper;
