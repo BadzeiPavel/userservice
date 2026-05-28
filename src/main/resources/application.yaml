@@ -1,3 +1,37 @@
+server:
+  port: ${USER_SERVICE_PORT:8081}
+app:
+  max-cards-per-user: 5
 spring:
   application:
     name: userservice
+  datasource:
+    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:store}?currentSchema=${DATABASE_SCHEMA:user_schema}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+  cache:
+    type: redis
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 60000
+  liquibase:
+    change-log: classpath:db/db.changelog-master.xml
+    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:store}?currentSchema=${DATABASE_SCHEMA:user_schema}
+    default-schema: ${DATABASE_SCHEMA:user_schema}
+    user: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:postgres}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
