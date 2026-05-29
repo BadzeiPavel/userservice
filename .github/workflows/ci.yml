@@ -126,7 +126,7 @@ jobs:
               -Dsonar.pullrequest.base=${{ github.base_ref }}"
           fi
 
-          mvn clean verify sonar:sonar -DskipTests \
+          mvn clean verify sonar:sonar \
             -Dsonar.projectKey=badzeipavel_test \
             -Dsonar.organization=badzeipavel \
             -Dsonar.host.url=https://sonarcloud.io \
