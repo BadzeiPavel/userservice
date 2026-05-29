@@ -1,7 +1,7 @@
 package com.innowise.userservice.service.impl.integration;
 
-import com.innowise.common.model.dto.UserDto;
-import com.innowise.common.model.dto.request.UserCreationDto;
+import com.innowise.commonstarter.model.dto.UserDto;
+import com.innowise.commonstarter.model.dto.request.UserCreationDto;
 import com.innowise.userservice.model.dto.request.UserPatchDto;
 import com.innowise.userservice.repository.UserRepository;
 import com.jayway.jsonpath.DocumentContext;

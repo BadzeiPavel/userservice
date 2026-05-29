@@ -1,7 +1,7 @@
 package com.innowise.userservice.service;
 
-import com.innowise.common.model.dto.request.UserCreationDto;
-import com.innowise.common.model.dto.UserDto;
+import com.innowise.commonstarter.model.dto.request.UserCreationDto;
+import com.innowise.commonstarter.model.dto.UserDto;
 import com.innowise.userservice.model.dto.request.UserPatchDto;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
