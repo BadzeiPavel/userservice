@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -35,11 +36,13 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.CREATED).body(created);
   }
 
+  @PreAuthorize("hasRole('ADMIN') or #id.toString() == authentication.name")
   @GetMapping("/{id}")
   public ResponseEntity<UserDto> getUserById(@PathVariable UUID id) {
     return ResponseEntity.ok(userService.getUserById(id));
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @GetMapping
   public ResponseEntity<Page<UserDto>> getUsersFiltered(
       @RequestParam(required = false) String name,
@@ -49,6 +52,7 @@ public class UserController {
     return ResponseEntity.ok(page);
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @PatchMapping("/{id}")
   public ResponseEntity<UserDto> updateUser(
       @PathVariable UUID id,
@@ -56,6 +60,7 @@ public class UserController {
     return ResponseEntity.ok(userService.updateUser(id, dto));
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @PutMapping("/{id}")
   public ResponseEntity<UserDto> changeUserActiveStatus(
       @PathVariable UUID id,
@@ -63,6 +68,7 @@ public class UserController {
     return ResponseEntity.ok(userService.changeUserActiveStatus(id, active));
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteUser(
       @PathVariable UUID id,
