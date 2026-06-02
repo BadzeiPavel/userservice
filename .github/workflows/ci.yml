@@ -38,6 +38,20 @@ jobs:
                 <password>${{ secrets.GITHUB_TOKEN }}</password>
               </server>
             </servers>
+            <profiles>
+              <profile>
+                <id>github-packages</id>
+                <activation>
+                  <activeByDefault>true</activeByDefault>
+                </activation>
+                <repositories>
+                  <repository>
+                    <id>github</id>
+                    <url>https://maven.pkg.github.com/${{ github.repository_owner }}/common-starter</url>
+                  </repository>
+                </repositories>
+              </profile>
+          </profiles>
           </settings>' > ~/.m2/settings.xml
 
       - name: Cache Maven dependencies
