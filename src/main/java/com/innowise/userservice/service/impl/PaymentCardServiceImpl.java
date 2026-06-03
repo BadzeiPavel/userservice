@@ -1,7 +1,7 @@
 package com.innowise.userservice.service.impl;
 
-import com.innowise.common.model.dto.PaymentCardDto;
-import com.innowise.common.model.dto.UserDto;
+import com.innowise.commonstarter.model.dto.PaymentCardDto;
+import com.innowise.commonstarter.model.dto.UserDto;
 import com.innowise.userservice.config.app.AppProperties;
 import com.innowise.userservice.exception.UserServiceException;
 import com.innowise.userservice.mapper.PaymentCardMapper;

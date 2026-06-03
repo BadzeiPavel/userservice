@@ -1,10 +1,10 @@
 package com.innowise.userservice.service.impl;
 
-import com.innowise.common.model.dto.request.UserCreationDto;
+import com.innowise.commonstarter.model.dto.UserDto;
+import com.innowise.commonstarter.model.dto.request.UserCreationDto;
 import com.innowise.userservice.config.cache.RedisConfig;
 import com.innowise.userservice.exception.UserServiceException;
 import com.innowise.userservice.mapper.UserMapper;
-import com.innowise.common.model.dto.UserDto;
 import com.innowise.userservice.model.dto.request.UserPatchDto;
 import com.innowise.userservice.model.entity.User;
 import com.innowise.userservice.repository.UserRepository;

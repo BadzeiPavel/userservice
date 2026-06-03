@@ -1,7 +1,7 @@
 package com.innowise.userservice.mapper;
 
-import com.innowise.common.model.dto.UserDto;
-import com.innowise.common.model.dto.request.UserCreationDto;
+import com.innowise.commonstarter.model.dto.UserDto;
+import com.innowise.commonstarter.model.dto.request.UserCreationDto;
 import com.innowise.userservice.model.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

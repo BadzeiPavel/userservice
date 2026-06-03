@@ -1,7 +1,7 @@
 package com.innowise.userservice.service.impl.integration;
 
 import com.innowise.userservice.model.dto.request.PaymentCardCreationDto;
-import com.innowise.common.model.dto.request.UserCreationDto;
+import com.innowise.commonstarter.model.dto.request.UserCreationDto;
 import java.time.LocalDate;
 
 public class TestDataFactory {

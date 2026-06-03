@@ -1,6 +1,6 @@
 package com.innowise.userservice.controller;
 
-import com.innowise.common.model.dto.response.ErrorResponse;
+import com.innowise.commonstarter.model.dto.response.ErrorResponse;
 import com.innowise.userservice.exception.UserServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;

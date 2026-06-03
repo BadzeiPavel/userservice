@@ -1,6 +1,6 @@
 package com.innowise.userservice.controller;
 
-import com.innowise.common.model.dto.PaymentCardDto;
+import com.innowise.commonstarter.model.dto.PaymentCardDto;
 import com.innowise.userservice.model.dto.request.PaymentCardCreationDto;
 import com.innowise.userservice.model.dto.request.PaymentCardPatchDto;
 import com.innowise.userservice.model.dto.response.CardsListDto;
@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -30,6 +31,7 @@ public class PaymentCardController {
 
   private final PaymentCardService cardService;
 
+  @PreAuthorize("hasRole('ADMIN') or #userId.toString() == authentication.name")
   @PostMapping("/users/{userId}")
   public ResponseEntity<PaymentCardDto> createCard(
       @PathVariable UUID userId,
@@ -38,16 +40,19 @@ public class PaymentCardController {
     return ResponseEntity.status(HttpStatus.CREATED).body(created);
   }
 
+  @PreAuthorize("hasRole('ADMIN') or @cardSecurity.isCardOwner(#id, authentication)")
   @GetMapping("/{id}")
   public ResponseEntity<PaymentCardDto> getCardById(@PathVariable UUID id) {
     return ResponseEntity.ok(cardService.getCardById(id));
   }
 
+  @PreAuthorize("hasRole('ADMIN') or #userId.toString() == authentication.name")
   @GetMapping("/users/{userId}")
   public ResponseEntity<CardsListDto> getAllCardsByUserId(@PathVariable UUID userId) {
     return ResponseEntity.ok(cardService.getAllCardsByUserId(userId));
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @GetMapping
   public ResponseEntity<Page<PaymentCardDto>> getCards(
       @RequestParam(required = false) String holder,
@@ -55,6 +60,7 @@ public class PaymentCardController {
     return ResponseEntity.ok(cardService.getCardsFiltered(holder, pageable));
   }
 
+  @PreAuthorize("hasRole('ADMIN') or @cardSecurity.isCardOwner(#id, authentication)")
   @PatchMapping("/{id}")
   public ResponseEntity<PaymentCardDto> updateCard(
       @PathVariable UUID id,
@@ -62,6 +68,7 @@ public class PaymentCardController {
     return ResponseEntity.ok(cardService.updateCard(id, dto));
   }
 
+  @PreAuthorize("hasRole('ADMIN') or @cardSecurity.isCardOwner(#id, authentication)")
   @PutMapping("/{id}")
   public ResponseEntity<PaymentCardDto> changeCardActiveStatus(
       @PathVariable UUID id,
@@ -69,6 +76,7 @@ public class PaymentCardController {
     return ResponseEntity.ok(cardService.changeCardActiveStatus(id, active));
   }
 
+  @PreAuthorize("hasRole('ADMIN') or @cardSecurity.isCardOwner(#id, authentication)")
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteCard(
       @PathVariable UUID id,
