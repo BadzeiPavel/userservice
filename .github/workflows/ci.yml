@@ -118,10 +118,10 @@ jobs:
             -Dsonar.organization=badzeipavel \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=$SONAR_TOKEN \
-            -Dsonar.qualitygate.wait=true
+            -Dsonar.qualitygate.wait=true \
             -Dsonar.junit.reportPaths=target/surefire-reports \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
-            -Dsonar.coverage.exclusions=**/client/**/*,**/config/**/*,**/controller/**/*,**/exception/**/*,**/mapper/**/*,**/model/**/*,**/repository/**/*,**/specification/**/*,**/security/**/* \
+            -Dsonar.coverage.exclusions=**/config/**/*,**/controller/**/*,**/exception/**/*,**/mapper/**/*,**/model/**/*,**/repository/**/*,**/specification/**/*,**/security/**/* \
             $PR_ARGS
 
   docker-build:
