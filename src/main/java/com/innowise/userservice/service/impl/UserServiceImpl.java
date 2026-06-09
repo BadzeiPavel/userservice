@@ -54,6 +54,14 @@ public class UserServiceImpl implements UserService {
 
   @Override
   @Transactional(readOnly = true)
+  public UserDto getUserByEmail(String email) {
+    User user = userRepository.findByEmailAndDeletedFalse(email)
+        .orElseThrow(() -> new UserServiceException("User not found with email: " + email));
+    return userMapper.toUserDto(user);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
   public Page<UserDto> getUsersFiltered(String name, String surname, Pageable pageable) {
     Specification<User> spec = UserSpecification.withFilters(name, surname);
     Page<User> page = SpecificationHelper.findPage(entityManager, User.class, spec, pageable);

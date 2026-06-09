@@ -13,6 +13,8 @@ public interface UserService {
 
   UserDto getUserById(UUID id);
 
+  UserDto getUserByEmail(String email);
+
   Page<UserDto> getUsersFiltered(String name, String surname, Pageable pageable);
 
   UserDto updateUser(UUID id, UserPatchDto dto);

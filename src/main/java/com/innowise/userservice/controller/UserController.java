@@ -42,6 +42,12 @@ public class UserController {
     return ResponseEntity.ok(userService.getUserById(id));
   }
 
+  @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+  @GetMapping(params = "email")
+  public ResponseEntity<UserDto> getUserByEmail(@RequestParam String email) {
+    return ResponseEntity.ok(userService.getUserByEmail(email));
+  }
+
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping
   public ResponseEntity<Page<UserDto>> getUsersFiltered(
