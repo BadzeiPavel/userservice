@@ -27,10 +27,4 @@ public abstract class BaseControllerIT extends BaseIntegrationTest {
     headers.setContentType(MediaType.APPLICATION_JSON);
     return new HttpEntity<>(body, headers);
   }
-
-  protected HttpHeaders jsonHeaders() {
-    HttpHeaders headers = new HttpHeaders();
-    headers.setContentType(MediaType.APPLICATION_JSON);
-    return headers;
-  }
 }
