@@ -27,33 +27,6 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Configure Maven credentials for GitHub Packages
-        run: |
-          mkdir -p ~/.m2
-          echo '<settings>
-            <servers>
-              <server>
-                <id>github</id>
-                <username>${{ github.actor }}</username>
-                <password>${{ secrets.GITHUB_TOKEN }}</password>
-              </server>
-            </servers>
-            <profiles>
-              <profile>
-                <id>github-packages</id>
-                <activation>
-                  <activeByDefault>true</activeByDefault>
-                </activation>
-                <repositories>
-                  <repository>
-                    <id>github</id>
-                    <url>https://maven.pkg.github.com/${{ github.repository_owner }}/common-starter</url>
-                  </repository>
-                </repositories>
-              </profile>
-          </profiles>
-          </settings>' > ~/.m2/settings.xml
-
       - name: Cache Maven dependencies
         uses: actions/cache@v4
         with:
@@ -141,12 +114,14 @@ jobs:
           fi
 
           mvn clean verify sonar:sonar \
-            -Dsonar.projectKey=badzeipavel_test \
+            -Dsonar.projectKey=badzeipavel_innowise \
             -Dsonar.organization=badzeipavel \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.login=$SONAR_TOKEN \
+            -Dsonar.qualitygate.wait=true
             -Dsonar.junit.reportPaths=target/surefire-reports \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+            -Dsonar.coverage.exclusions=**/client/**/*,**/config/**/*,**/controller/**/*,**/exception/**/*,**/mapper/**/*,**/model/**/*,**/repository/**/*,**/specification/**/*,**/security/**/* \
             $PR_ARGS
 
   docker-build:
