@@ -1,15 +1,17 @@
 package com.innowise.userservice.service.impl.unit;
 
-import com.innowise.userservice.exception.UserServiceException;
-import com.innowise.userservice.mapper.UserMapper;
 import com.innowise.commonstarter.model.dto.UserDto;
 import com.innowise.commonstarter.model.dto.request.UserCreationDto;
+import com.innowise.userservice.exception.UserServiceException;
+import com.innowise.userservice.mapper.UserMapper;
 import com.innowise.userservice.model.dto.request.UserPatchDto;
 import com.innowise.userservice.model.entity.PaymentCard;
 import com.innowise.userservice.model.entity.User;
 import com.innowise.userservice.repository.UserRepository;
+import com.innowise.userservice.repository.specification.SpecificationHelper;
 import com.innowise.userservice.service.impl.UserServiceImpl;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -17,11 +19,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.cache.CacheManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -118,6 +130,41 @@ class UserServiceImplTest {
 
     UserDto result = userService.changeUserActiveStatus(userId, false);
     assertThat(result.active()).isFalse();
+  }
+
+  @Test
+  void getUserByEmail_shouldReturnUser() {
+    String email = "john@example.com";
+    when(userRepository.findByEmailAndDeletedFalse(email)).thenReturn(Optional.of(userEntity));
+    when(userMapper.toUserDto(userEntity)).thenReturn(userDto);
+
+    UserDto result = userService.getUserByEmail(email);
+    assertThat(result.email()).isEqualTo(email);
+  }
+
+  @Test
+  void getUserByEmail_shouldThrowWhenNotFound() {
+    String email = "notfound@example.com";
+    when(userRepository.findByEmailAndDeletedFalse(email)).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> userService.getUserByEmail(email))
+        .isInstanceOf(UserServiceException.class);
+  }
+
+  @Test
+  void getUsersFiltered_shouldReturnPage() {
+    Specification<User> spec = mock(Specification.class);
+    Page<User> page = new PageImpl<>(List.of(userEntity));
+    try (MockedStatic<SpecificationHelper> mockedHelper = mockStatic(SpecificationHelper.class)) {
+      mockedHelper.when(() -> SpecificationHelper.findPage(
+              any(EntityManager.class), eq(User.class),
+              any(Specification.class), any(Pageable.class)))
+          .thenReturn(page);
+      when(userMapper.toUserDto(userEntity)).thenReturn(userDto);
+
+      Page<UserDto> result = userService.getUsersFiltered("John", "Doe", PageRequest.of(0, 10));
+      assertThat(result.getContent()).containsExactly(userDto);
+    }
   }
 
   @Test
